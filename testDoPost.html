@@ -1,0 +1,126 @@
+<button onclick="test()">Test POST</button>
+
+<script>
+async function test() {
+   const passport = {
+  version: 4,
+  exportedAt: "2026-07-28T06:09:14.776Z",
+  currentLang: "en",
+  country: "BE",
+  places: [
+    {
+      id: "bba95d84-5d7c-4f0d-8702-b913fbccafbb",
+      name: "Place B",
+      evaluator: "",
+      location: "",
+      placeType: "other",
+      familiarity: "often",
+      note: "",
+      photo: "",
+      tags: ["nothing_to_do", "accessible", "need_shade"],
+      scores: {
+        safety: 5,
+        reachability: 5,
+        comfort: 5,
+        green: 5,
+        activity: 5,
+        inclusion: 5,
+        vibe: 5
+      }
+    },
+    {
+      id: "f2b1d6af-6371-4363-b99a-d6f0b2623b78",
+      name: "Place C",
+      evaluator: "",
+      location: "",
+      placeType: "other",
+      familiarity: "often",
+      note: "",
+      photo: "",
+      tags: ["nice_to_chill", "too_controlled", "good_for_sport", "heat_island"],
+      scores: {
+        safety: 5,
+        reachability: 5,
+        comfort: 5,
+        green: 5,
+        activity: 5,
+        inclusion: 5,
+        vibe: 5
+      }
+    },
+    {
+      id: "6c5dcb6d-67f0-4e0c-8bd1-c3470a8b2d8d",
+      name: "Place C",
+      evaluator: "",
+      location: "",
+      placeType: "other",
+      familiarity: "often",
+      note: "",
+      photo: "",
+      tags: ["fun", "accessible", "hidden_gem", "too_controlled"],
+      scores: {
+        safety: 5,
+        reachability: 1,
+        comfort: 5,
+        green: 6,
+        activity: 3,
+        inclusion: 3,
+        vibe: 5
+      }
+    },
+    {
+      id: "b1a8743f-2eb0-4e06-ba59-633fbfb31195",
+      name: "Place D",
+      evaluator: "",
+      location: "",
+      placeType: "other",
+      familiarity: "often",
+      note: "",
+      photo: "",
+      tags: ["grey", "paved_over", "hard_to_reach"],
+      scores: {
+        safety: 3,
+        reachability: 7,
+        comfort: 9,
+        green: 3,
+        activity: 1,
+        inclusion: 7,
+        vibe: 2
+      }
+    },
+    {
+      id: "87048310-0910-435b-b458-f3b65a8dc3aa",
+      name: "Place E",
+      evaluator: "",
+      location: "",
+      placeType: "other",
+      familiarity: "often",
+      note: "",
+      photo: "",
+      tags: ["hidden_gem", "too_controlled"],
+      scores: {
+        safety: 5,
+        reachability: 5,
+        comfort: 5,
+        green: 2,
+        activity: 1,
+        inclusion: 2,
+        vibe: 5
+      }
+    }
+  ]
+};
+
+    const response = await fetch("https://script.google.com/macros/s/AKfycbxaHjWfPuPX49GuD_6kvGXUmD3A-tgcdvBkWIpARTVP85E0Af1qgu-B_p2_W5HjtWsHQQ/exec", {
+        method: "POST",
+        body: JSON.stringify(passport),
+    });
+
+    const result = await response.json();
+
+    console.log(result);
+}
+</script>
+
+</body>
+</html>

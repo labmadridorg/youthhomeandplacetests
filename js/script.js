@@ -50,10 +50,22 @@ let places = [
 
 let activePlaceId = places[0].id;
 let sortMode = 'manual';
+let isSubmitting = false;
+const SUBMIT_EVALUATION_URL = 'https://script.google.com/macros/s/AKfycbw3CEYgQOm9QA-jmlM41nq_DHYj8304FJgj0e4tvKtMtThI9hsb2kzPrfmGNe-Y7apT9A/exec';
 
 function status(text){
   const el = document.getElementById('status');
   if(el) el.textContent = text;
+}
+
+function setSubmitFeedback(message, isError){
+  const el = document.getElementById('submitStatus');
+  if(!el) return;
+  el.textContent = message || '';
+  el.style.display = message ? 'inline-flex' : 'none';
+  el.style.background = isError ? '#fde5db' : '#f5f4eb';
+  el.style.color = isError ? '#8c4c35' : '#5d777d';
+  el.style.borderColor = isError ? '#f1d1c4' : 'rgba(78,141,143,0.25)';
 }
 
 function normalizePlaces(arr){
@@ -710,6 +722,55 @@ function exportJSON(){
   a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 800);
   status(`JSON exported â€¢ ${places.length} place${places.length===1?'':'s'}`);
+}
+
+function getPassportForSubmission(){
+  return { 
+    version:3, 
+    country: "BE",  
+    currentLang,
+    exportedAt:new Date().toISOString(), 
+    places 
+  };
+}
+
+async function submitPassport(passport){
+  if(isSubmitting) return null;
+
+  const button = document.getElementById('submitEvaluationBtn');
+  isSubmitting = true;
+  if(button){
+    button.disabled = true;
+    button.textContent = 'Submitting...';
+  }
+  status('Submitting evaluation...');
+
+  try {
+    const response = await fetch(SUBMIT_EVALUATION_URL, {
+      method: 'POST',
+      body: JSON.stringify(passport)
+    });
+
+    const result = await response.json();
+    if(!response.ok){
+      throw new Error(result?.error || 'Submission failed');
+    }
+
+    setSubmitFeedback('Evaluation submitted successfully', false);
+    status('Evaluation submitted successfully');
+    return result;
+  } catch(err){
+    console.error(err);
+    setSubmitFeedback('Failed to submit evaluation', true);
+    status('Failed to submit evaluation');
+    return null;
+  } finally {
+    isSubmitting = false;
+    if(button){
+      button.disabled = false;
+      button.textContent = 'Submit Evaluation';
+    }
+  }
 }
 
 function addPlace(){
@@ -1417,7 +1478,7 @@ const TAG_META = {
 
 const I18N = {
   nl: {
-    title:'Place Passport Generator v3 by Urban Foxes', subtitle:'Een smartphonegerichte passport-tool met sterkere vergelijklogica, printoutput, foto-ondersteuning, mini-radars en deelbare export per passport.', addPlace:'+ Plek toevoegen', saveBrowser:'Bewaar in deze browser', exportJSON:'Export JSON', exportCSV:'Export CSV', printPassports:'Print passports', importMerge:'Importeer / voeg JSON samen',
+    title:'Place Passport Generator v3 by Urban Foxes', subtitle:'Een smartphonegerichte passport-tool met sterkere vergelijklogica, printoutput, foto-ondersteuning, mini-radars en deelbare export per passport.', addPlace:'+ Plek toevoegen', saveBrowser:'Bewaar in deze browser', exportJSON:'Export JSON', exportCSV:'Export CSV', printPassports:'Print passports', submitEvaluation:'Submit Evaluation', importMerge:'Importeer / voeg JSON samen',
     places:'Plekken', placeName:'Naam van de plek', evaluator:'Evaluator / groep', location:'Wijk / locatie', placeType:'Type plek', familiarity:'Hoe ken je deze plek?', photo:'Foto van de plek', choosePhoto:'Kies foto', takePhoto:'Neem foto', removePhoto:'Verwijder foto', noPhoto:'Nog geen foto toegevoegd', photoHelper:'Kies uit je galerij/bestanden of neem een nieuwe foto. Gebruikt in de passport-header, beeldexport en printweergave.', shortNote:'Korte notitie', fastTags:'Snelle tags', criteria:'Jongerencriteria voor publieke ruimte',
     sortBy:'Sorteer op', manual:'Aanmaakvolgorde', avgDesc:'Gemiddelde score â†“', avgAsc:'Gemiddelde score â†‘', nameAZ:'Naam Aâ€“Z', safetyDesc:'Veiligheid â†“', comfortDesc:'Comfort â†“', greenDesc:'Groen â†“', activityDesc:'Activiteit â†“', inclusionDesc:'Inclusie â†“', vibeDesc:'Sfeer â†“', passportHint:'Elke plek wordt een sterker passport met moodlabel, samenvattende zin, tags en duidelijkere vergelijking.',
     notSaved:'Nog niet opgeslagen', csvExported:'CSV geÃ«xporteerd â€¢ {count} plek(ken)', jsonExported:'JSON geÃ«xporteerd â€¢ {count} plek(ken)', imageDownloaded:'Afbeelding gedownload â€¢ {name}', shared:'Passport gedeeld â€¢ {name}', copied:'Samenvatting gekopieerd â€¢ {name}', copiedMsg:'Passport-samenvatting gekopieerd naar klembord.', saved:'Opgeslagen in deze browser â€¢ {count} plek(ken)', loaded:'Browsersave geladen â€¢ {count} plek(ken)', imported:'JSON geÃ¯mporteerd â€¢ {count} plek(ken)', merged:'{files} JSON-bestand(en) samengevoegd â€¢ {count} plek(ken)', importInvalid:'Dit JSON-bestand bevat geen geldige place-data.', importInvalidMulti:'Geen geldige plekken gevonden in de geselecteerde JSON-bestanden.', importFailed:'Kon deze JSON-bestanden niet importeren.', storageFull:'Browseropslag is vol', storageFullMsg:'Deze browser raakt vol. Gebruik minder of kleinere fotoâ€™s, vervang grote fotoâ€™s, of exporteer je werk als JSON.', saveFailed:'Kon niet opslaan',
@@ -1429,7 +1490,7 @@ const I18N = {
     bestFor_meeting:'afspreken en hangen', bestFor_rest:'tot rust komen en even pauzeren', bestFor_pass:'passeren en doorsteken', bestFor_sport:'sport en beweging', bestFor_mixed:'gemengde groepen en langer verblijven', bestFor_friends:'vrienden ontmoeten', bestFor_calm:'rustig verblijven', bestFor_discover:'ontdekken en rondhangen', bestFor_chill:'chillen en blijven hangen', bestFor_fun:'vrije tijd en plezier', bestFor_daily:'dagelijks gebruik van publieke ruimte', need_basics:'comfort en basisvoorzieningen', need_inclusion:'inclusie en openheid', need_safety:'veilige toegang en oversteken', need_activity:'dingen om te doen en redenen om te blijven', need_green:'groen, schaduw en verkoeling'
   },
   en: {
-    title:'Place Passport Generator v3 by Urban Foxes', subtitle:'A smartphone-first passport tool with stronger compare logic, print output, photo support, mini radars, and shareable exports per passport.', addPlace:'+ Add place', saveBrowser:'Save in this browser', exportJSON:'Export JSON', exportCSV:'Export CSV', printPassports:'Print passports', importMerge:'Import / merge JSON',
+    title:'Place Passport Generator v3 by Urban Foxes', subtitle:'A smartphone-first passport tool with stronger compare logic, print output, photo support, mini radars, and shareable exports per passport.', addPlace:'+ Add place', saveBrowser:'Save in this browser', exportJSON:'Export JSON', exportCSV:'Export CSV', printPassports:'Print passports', submitEvaluation:'Submit Evaluation', importMerge:'Import / merge JSON',
     places:'Places', placeName:'Place name', evaluator:'Evaluator / group', location:'Neighbourhood / location', placeType:'Place type', familiarity:'How do you know this place?', photo:'Place photo', choosePhoto:'Choose photo', takePhoto:'Take photo', removePhoto:'Remove photo', noPhoto:'No photo added yet', photoHelper:'Choose from your gallery/files or take a new photo. Used in the passport header, image export, and print view.', shortNote:'Short note', fastTags:'Fast tags', criteria:'Youth public space criteria',
     sortBy:'Sort by', manual:'Creation order', avgDesc:'Average score â†“', avgAsc:'Average score â†‘', nameAZ:'Name Aâ€“Z', safetyDesc:'Safety â†“', comfortDesc:'Comfort â†“', greenDesc:'Green â†“', activityDesc:'Activity â†“', inclusionDesc:'Inclusion â†“', vibeDesc:'Vibe â†“', passportHint:'Each place becomes a stronger passport with a mood label, summary sentence, tags, and clearer comparison.',
     notSaved:'Not saved yet', csvExported:'CSV exported â€¢ {count} place(s)', jsonExported:'JSON exported â€¢ {count} place(s)', imageDownloaded:'Image downloaded â€¢ {name}', shared:'Passport shared â€¢ {name}', copied:'Summary copied â€¢ {name}', copiedMsg:'Passport summary copied to clipboard.', saved:'Saved in this browser â€¢ {count} place(s)', loaded:'Loaded browser save â€¢ {count} place(s)', imported:'Imported JSON â€¢ {count} place(s)', merged:'Merged {files} JSON file(s) â€¢ {count} place(s)', importInvalid:'This JSON file does not contain valid place data.', importInvalidMulti:'No valid places were found in the selected JSON files.', importFailed:'Could not import these JSON files.', storageFull:'Browser storage is full', storageFullMsg:'This browser is running out of storage. Use fewer or smaller photos, replace large photos, or export your work as JSON.', saveFailed:'Could not save',
@@ -1470,13 +1531,22 @@ function applyStaticTexts(){
   const h1 = document.querySelector('.topbar h1'); if (h1) h1.textContent = t('title');
   const sub = document.querySelector('.topbar .sub'); if (sub) sub.textContent = t('subtitle');
   const leftH2 = document.querySelector('.panel.left h2'); if (leftH2) leftH2.textContent = t('places');
+  const submitBtn = document.getElementById('submitEvaluationBtn');
+  if (submitBtn) {
+    const submitLabel = t('submitEvaluation');
+    submitBtn.textContent = submitLabel === 'submitEvaluation' ? 'Submit Evaluation' : submitLabel;
+  }
+  const importBtn = document.getElementById('importJsonBtn');
+  if (importBtn) {
+    const importLabel = t('importMerge');
+    importBtn.textContent = importLabel === 'importMerge' ? 'Import / merge JSON' : importLabel;
+  }
   const btns = document.querySelectorAll('.toolbar .btn');
   if (btns[0]) btns[0].textContent = t('addPlace');
   if (btns[1]) btns[1].textContent = t('saveBrowser');
   if (btns[2]) btns[2].textContent = t('exportJSON');
   if (btns[3]) btns[3].textContent = t('exportCSV');
   if (btns[4]) btns[4].textContent = t('printPassports');
-  if (btns[5]) btns[5].textContent = t('importMerge');
   const ls = document.getElementById('langSelect'); if (ls) ls.value = currentLang;
   const langLabel = document.getElementById('langLabel'); if (langLabel) langLabel.textContent = t('language');
   const st = document.getElementById('status'); if (st && (!st.textContent || st.textContent === 'Not saved yet' || st.textContent === 'Nog niet opgeslagen')) st.textContent = t('notSaved');

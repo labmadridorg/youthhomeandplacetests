@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Place Passport Generator v3 — Smartphone + Print + Share + Image Export</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=20260728-2" />
 </head>
 <body>
 <div class="wrap">
@@ -21,9 +21,11 @@
     <button class="btn" onclick="exportJSON()">Export JSON</button>
     <button class="btn" onclick="exportCSV()">Export CSV</button>
     <button class="btn" onclick="printPassports()">Print passports</button>
+    <button id="submitEvaluationBtn" class="btn" onclick="submitPassport(getPassportForSubmission())">Submit Evaluation</button>
     <span class="status" id="status">Not saved yet</span>
+    <span id="submitStatus" class="status" style="display:none; border-color:rgba(78,141,143,0.25); background:#f5f4eb; color:#5d777d;"> </span>
     <input type="file" id="importFile" accept=".json,application/json" style="display:none" />
-    <button class="btn" onclick="document.getElementById('importFile').click()">Import JSON</button>
+    <button id="importJsonBtn" class="btn" onclick="document.getElementById('importFile').click()">Import JSON</button>
   </div>
 
   <div class="layout">
@@ -62,6 +64,6 @@
   </div>
 </div>
 
-<script src="js/script.js"></script>
+<script src="js/script.js?v=20260728-2"></script>
 </body>
 </html>
