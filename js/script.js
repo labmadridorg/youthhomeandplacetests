@@ -724,10 +724,25 @@ function exportJSON(){
   status(`JSON exported â€¢ ${places.length} place${places.length===1?'':'s'}`);
 }
 
+function getSheetNameInputValue(){
+  const input = document.getElementById('sheetNameInput');
+  return (input?.value || '').trim() || PARTNER_CONFIG.country;
+}
+
+function initSheetNameInput(){
+  const input = document.getElementById('sheetNameInput');
+  if(!input) return;
+  input.value = localStorage.getItem(PARTNER_CONFIG.sheetNameStorageKey) || PARTNER_CONFIG.country;
+  input.addEventListener('input', () => {
+    localStorage.setItem(PARTNER_CONFIG.sheetNameStorageKey, input.value.trim());
+  });
+}
+
 function getPassportForSubmission(){
   return { 
     version:3, 
     country: "BE",  
+    sheetName: getSheetNameInputValue(),
     currentLang,
     exportedAt:new Date().toISOString(), 
     places 
@@ -1580,6 +1595,7 @@ function render(){ applyStaticTexts(); updateSortSelect(); const hint=document.q
 function wireImport(){ const input=document.getElementById('importFile'); input.multiple=true; input.addEventListener('change', async e=>{ const files=Array.from(e.target.files||[]); if(!files.length) return; try{ let incoming=[]; for(const file of files){ const text=await file.text(); const payload=JSON.parse(text); if(payload?.places?.length) incoming.push(...normalizePlaces(payload.places)); } if(!incoming.length){ alert(t('importInvalidMulti')); input.value=''; return; } if(places.length===1 && isStarterPlace(places[0])) places=[]; const existingIds=new Set(places.map(p=>p.id)); incoming.forEach(p=>{ while(existingIds.has(p.id)) p.id=crypto.randomUUID(); existingIds.add(p.id); places.push(p); }); activePlaceId=activePlaceId||places[0]?.id||''; render(); saveBoard(true); status(files.length>1 ? t('merged',{files:files.length,count:incoming.length}) : t('imported',{count:incoming.length})); }catch(err){ console.error(err); alert(t('importFailed')); } input.value=''; }); document.getElementById('sortSelect').addEventListener('change', e=>{ sortMode=e.target.value; renderPassports(); saveBoard(false); }); }
 setupLanguageUI();
 wireImport();
+initSheetNameInput();
 loadBoard();
 applyStaticTexts();
 render();

@@ -48,6 +48,10 @@ h1{
   font-size:12px;font-weight:700;cursor:pointer;
 }
 .btn.primary{background:#dce7eb;border-color:rgba(78,141,143,0.55)}
+.sheet-name-input{
+  border:1px solid rgba(78,141,143,0.4);background:#fff;color:#35595f;padding:9px 12px;border-radius:8px;
+  font-size:12px;font-weight:700;width:150px;
+}
 .status{
   font-size:12px;font-weight:700;color:#5d777d;background:#f5f4eb;border:1px solid rgba(78,141,143,0.25);padding:8px 10px;border-radius:4px;
 }
