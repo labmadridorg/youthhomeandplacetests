@@ -51,7 +51,7 @@ let places = [
 let activePlaceId = places[0].id;
 let sortMode = 'manual';
 let isSubmitting = false;
-const SUBMIT_EVALUATION_URL = 'https://script.google.com/macros/s/AKfycbw3CEYgQOm9QA-jmlM41nq_DHYj8304FJgj0e4tvKtMtThI9hsb2kzPrfmGNe-Y7apT9A/exec';
+const SUBMIT_EVALUATION_URL = PARTNER_CONFIG.appsScriptUrl;
 
 function status(text){
   const el = document.getElementById('status');
@@ -744,8 +744,9 @@ async function submitPassport(passport){
     button.textContent = 'Submitting...';
   }
   status('Submitting evaluation...');
-
+  
   try {
+
     const response = await fetch(SUBMIT_EVALUATION_URL, {
       method: 'POST',
       body: JSON.stringify(passport)

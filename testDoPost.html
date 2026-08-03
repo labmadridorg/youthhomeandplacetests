@@ -1,5 +1,6 @@
 <button onclick="test()">Test POST</button>
 
+<script src="js/config.js"></script>
 <script>
 async function test() {
    const passport = {
@@ -111,7 +112,7 @@ async function test() {
   ]
 };
 
-    const response = await fetch("https://script.google.com/macros/s/AKfycbxaHjWfPuPX49GuD_6kvGXUmD3A-tgcdvBkWIpARTVP85E0Af1qgu-B_p2_W5HjtWsHQQ/exec", {
+    const response = await fetch(PARTNER_CONFIG.appsScriptUrl, {
         method: "POST",
         body: JSON.stringify(passport),
     });
