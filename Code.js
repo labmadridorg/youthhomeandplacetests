@@ -1,6 +1,28 @@
 const PHOTO_FOLDER_ID = "1OxXXCuKZWoYvO7t6UreTD71OrFVu85u4";
 const PLACE_ID_COLUMN = 4;
 const PHOTO_URL_COLUMN = 11;
+const DEFAULT_SHEET_NAME = "BE";
+
+// Column order must match buildRow()
+const SHEET_HEADERS = [
+  "Country", "Version", "Current Lang", "Exported At",
+  "Place Id", "Name", "Evaluator", "Location", "Place Type", "Familiarity", "Note",
+  "Photo Url", "Tags",
+  "Safety", "Reachability", "Comfort", "Green", "Activity", "Inclusion", "Vibe"
+];
+
+function getOrCreateSheet(spreadsheet, sheetName) {
+
+  let sheet = spreadsheet.getSheetByName(sheetName);
+
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet(sheetName);
+    sheet.appendRow(SHEET_HEADERS);
+  }
+
+  return sheet;
+
+}
 
 function findPlaceRow(rows, placeId) {
 
@@ -105,11 +127,14 @@ function doPost(e) {
 
   try {
 
-    const sheet = SpreadsheetApp
-      .getActiveSpreadsheet()
-      .getSheetByName("BE");
-
     const data = JSON.parse(e.postData.contents);
+
+    const sheetName = (data.sheetName || "").toString().trim() || DEFAULT_SHEET_NAME;
+
+    const sheet = getOrCreateSheet(
+      SpreadsheetApp.getActiveSpreadsheet(),
+      sheetName
+    );
 
     const rows = sheet.getDataRange().getValues();
 
