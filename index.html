@@ -16,6 +16,7 @@
   </div>
 
   <div class="toolbar">
+    <!-- TODO: create 2 rows-->
     <input type="text" id="sheetNameInput" class="sheet-name-input" placeholder="Sheet name (e.g. BE)" />
     <button class="btn primary" onclick="addPlace()">+ Plek toevoegen</button>
     <button class="btn" onclick="saveBoard()">Bewaar in deze browser</button>
@@ -26,6 +27,10 @@
     <span class="status" id="status">Not saved yet</span>
     <input type="file" id="importFile" accept=".json,application/json" style="display:none" />
     <button id="importJsonBtn" class="btn" onclick="document.getElementById('importFile').click()">Import JSON</button>
+    <!-- TODO: ask for input in popup-->
+    <input type="text" id="importWorksheetInput" class="sheet-name-input" placeholder="Worksheet name to import" />
+    <input type="file" id="importEvaluationFile" accept=".xlsx" style="display:none" />
+    <button id="importEvaluationBtn" class="btn" onclick="handleImportEvaluationClick()">Import Evaluation</button>
   </div>
 
   <div class="layout">
@@ -66,5 +71,7 @@
 
 <script src="js/config.js"></script>
 <script src="js/script.js?v=20260728-2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="js/sheet-import.js?v=20260803-1"></script>
 </body>
 </html>

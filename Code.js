@@ -8,7 +8,8 @@ const SHEET_HEADERS = [
   "Country", "Version", "Current Lang", "Exported At",
   "Place Id", "Name", "Evaluator", "Location", "Place Type", "Familiarity", "Note",
   "Photo Url", "Tags",
-  "Safety", "Reachability", "Comfort", "Green", "Activity", "Inclusion", "Vibe"
+  "Safety", "Reachability", "Comfort", "Green", "Activity", "Inclusion", "Vibe",
+  "Place Json"
 ];
 
 function getOrCreateSheet(spreadsheet, sheetName) {
@@ -52,43 +53,75 @@ function findPhotoFile(placeId) {
   return null;
 }
 
-function updatePhoto(placeId, photo, existingFile) {
+function directDriveImageUrl(fileId) {
+  // uc?export=view is unreliable for hotlinking (Drive often serves a confirmation page instead of the image).
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+}
 
-  // No previous photo and no new photo
-  if (!existingFile && !photo) {
-    return "";
+// photo: base64 data URL, only present when a new/replacement image was uploaded this session.
+// photoUrl: the place's last known synced Drive URL, sent back unchanged by the frontend.
+function updatePhoto(placeId, photo, photoUrl, existingFile) {
+
+  // New or replacement photo uploaded this session.
+  if (photo) {
+
+    if (existingFile) {
+      existingFile.setTrashed(true);
+    }
+
+    const matches = photo.match(/^data:(.+);base64,(.+)$/);
+
+    if (!matches) {
+      throw new Error("Invalid image format.");
+    }
+
+    const mimeType = matches[1];
+    const imageData = matches[2];
+    const extension = mimeType.split("/")[1];
+
+    const blob = Utilities.newBlob(
+      Utilities.base64Decode(imageData),
+      mimeType,
+      `${placeId}.${extension}`
+    );
+
+    const folder = DriveApp.getFolderById(PHOTO_FOLDER_ID);
+    const file = folder.createFile(blob);
+    // New files inherit the folder's sharing; setting per-file sharing is blocked by domain policy and unnecessary.
+
+    return directDriveImageUrl(file.getId());
+
   }
 
-  // Photo deleted
-  if (!photo) {
-    existingFile.setTrashed(true);
-    return "";
+  // No new upload, but the place already has a synced photo: leave Drive untouched.
+  if (photoUrl) {
+    return photoUrl;
   }
 
-  // Replace existing photo
+  // No new upload and no known photoUrl: the photo was explicitly removed.
   if (existingFile) {
     existingFile.setTrashed(true);
   }
 
-  const matches = photo.match(/^data:(.+);base64,(.+)$/);
+  return "";
 
-  if (!matches) {
-    throw new Error("Invalid image format.");
-  }
+}
 
-  const mimeType = matches[1];
-  const imageData = matches[2];
-  const extension = mimeType.split("/")[1];
+// The single source of truth for import: a faithful snapshot of the place, photo bytes excluded.
+function buildPlaceJson(place, photoUrl) {
 
-  const blob = Utilities.newBlob(
-    Utilities.base64Decode(imageData),
-    mimeType,
-    `${placeId}.${extension}`
-  );
-
-  const folder = DriveApp.getFolderById(PHOTO_FOLDER_ID);
-
-  return folder.createFile(blob).getUrl();
+  return JSON.stringify({
+    id: place.id,
+    name: place.name,
+    evaluator: place.evaluator,
+    location: place.location,
+    placeType: place.placeType,
+    familiarity: place.familiarity,
+    note: place.note,
+    photoUrl: photoUrl,
+    tags: place.tags,
+    scores: place.scores
+  });
 
 }
 
@@ -117,7 +150,9 @@ function buildRow(data, place, photoUrl) {
     place.scores.green,
     place.scores.activity,
     place.scores.inclusion,
-    place.scores.vibe
+    place.scores.vibe,
+
+    buildPlaceJson(place, photoUrl)
 
   ];
 
@@ -137,40 +172,53 @@ function doPost(e) {
     );
 
     const rows = sheet.getDataRange().getValues();
+    const results = [];
 
     for (const place of data.places) {
 
-      const sheetRow = findPlaceRow(rows, place.id);
+      // Isolate failures per place so one bad photo doesn't block the rest of the batch.
+      try {
 
-      const existingFile =
-        sheetRow === -1
-          ? null
-          : findPhotoFile(place.id);
+        const sheetRow = findPlaceRow(rows, place.id);
 
-      const photoUrl = updatePhoto(
-        place.id,
-        place.photo,
-        existingFile
-      );
+        // Only scan Drive when we might need to create, replace, or trash a file.
+        const needsExistingFile = sheetRow !== -1 && (!!place.photo || !place.photoUrl);
+        const existingFile = needsExistingFile ? findPhotoFile(place.id) : null;
 
-      const rowData = buildRow(
-        data,
-        place,
-        photoUrl
-      );
+        const photoUrl = updatePhoto(
+          place.id,
+          place.photo,
+          place.photoUrl,
+          existingFile
+        );
 
-      if (sheetRow === -1) {
+        const rowData = buildRow(
+          data,
+          place,
+          photoUrl
+        );
 
-        sheet.appendRow(rowData);
-        rows.push(rowData);
+        if (sheetRow === -1) {
 
-      } else {
+          sheet.appendRow(rowData);
+          rows.push(rowData);
 
-        sheet
-          .getRange(sheetRow, 1, 1, rowData.length)
-          .setValues([rowData]);
+        } else {
 
-        rows[sheetRow - 1] = rowData;
+          sheet
+            .getRange(sheetRow, 1, 1, rowData.length)
+            .setValues([rowData]);
+
+          rows[sheetRow - 1] = rowData;
+
+        }
+
+        results.push({ id: place.id, photoUrl: photoUrl });
+
+      } catch (placeErr) {
+
+        console.error(`Place ${place.id} failed: ${placeErr}`);
+        results.push({ id: place.id, error: placeErr.toString() });
 
       }
 
@@ -178,7 +226,8 @@ function doPost(e) {
 
     return ContentService
       .createTextOutput(JSON.stringify({
-        success: true
+        success: true,
+        results: results
       }))
       .setMimeType(ContentService.MimeType.JSON);
 
