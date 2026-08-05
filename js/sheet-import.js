@@ -18,16 +18,8 @@ const PLACE_JSON_HEADER = 'place json';
 
 let isImportingEvaluation = false;
 
-function initImportEvaluationWorksheetInput(){
-  const input = document.getElementById('importWorksheetInput');
-  if(!input) return;
-  input.value = localStorage.getItem(IMPORT_WORKSHEET_STORAGE_KEY) || '';
-  input.addEventListener('input', () => {
-    localStorage.setItem(IMPORT_WORKSHEET_STORAGE_KEY, input.value.trim());
-  });
-}
-
 function handleImportEvaluationClick(){
+  if(isImportingEvaluation) return;
   document.getElementById('importEvaluationFile')?.click();
 }
 
@@ -110,22 +102,16 @@ async function importEvaluationFromFile(file, worksheetName){
   status(`Imported evaluation \u2022 ${count} place(s) from "${matchedName}"`);
 }
 
-// Falls back to a prompt so the file dialog is never blocked by an empty text box.
 function resolveWorksheetName(){
-  const input = document.getElementById('importWorksheetInput');
-  let worksheetName = (input?.value || '').trim();
-  if(!worksheetName){
-    worksheetName = (window.prompt('Enter the worksheet (tab) name to import:') || '').trim();
-    if(worksheetName && input){
-      input.value = worksheetName;
-      localStorage.setItem(IMPORT_WORKSHEET_STORAGE_KEY, worksheetName);
-    }
+  const previousValue = localStorage.getItem(IMPORT_WORKSHEET_STORAGE_KEY) || '';
+  const worksheetName = (window.prompt('Enter the worksheet (tab) name to import:', previousValue) || '').trim();
+  if(worksheetName){
+    localStorage.setItem(IMPORT_WORKSHEET_STORAGE_KEY, worksheetName);
   }
   return worksheetName;
 }
 
 function wireImportEvaluation(){
-  initImportEvaluationWorksheetInput();
   const fileInput = document.getElementById('importEvaluationFile');
   if(!fileInput) return;
 
