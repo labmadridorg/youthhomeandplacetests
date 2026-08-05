@@ -476,6 +476,7 @@ async function askSheetNameForSubmission(){
     sheetName = await openImportModal({
       mode: 'input',
       initialValue: previousValue,
+      promptText: 'Enter the worksheet (tab) name to submit this evaluation to:',
       title: 'Submit evaluation',
       message: 'Enter the worksheet (tab) name to submit this evaluation to.',
       confirmText: 'Submit'
