@@ -368,7 +368,7 @@ body{
 }
 
 @media (max-width: 900px){
-  .wrap{padding:14px;}
+  .wrap{padding:0 14px 14px;}
   .topbar-lang{
     display:none;
   }
@@ -408,14 +408,14 @@ body{
     top:0;
     z-index:30;
     margin:0 0 16px 0;
-    padding:0;
+    padding:6px;
     display:grid;
     grid-template-columns:repeat(3,minmax(0,1fr));
     gap:6px;
     border:0;
-    border-radius:0;
-    overflow:visible;
-    background:transparent;
+    border-radius:10px;
+    overflow:hidden;
+    background:#ece9df;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
   }
@@ -497,7 +497,7 @@ body{
 }
 
 @media (max-width: 700px){
-  .wrap{padding:12px;}
+  .wrap{padding:0 12px 12px;}
   .panel{
     padding:14px;
     border-radius:2px;
@@ -599,7 +599,7 @@ body{
 }
 
 @media (max-width: 420px){
-  .wrap{padding:10px;}
+  .wrap{padding:0 10px 10px;}
   h1{font-size:24px;}
   .sub{font-size:12px;}
   .panel h2{font-size:17px;}
