@@ -75,6 +75,20 @@
   </div>
 </div>
 
+<div id="worksheetModal" class="modal-overlay" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="worksheetModalTitle">
+    <h3 id="worksheetModalTitle">Import evaluation</h3>
+    <p class="modal-copy">Enter the worksheet (tab) name from your exported evaluation file.</p>
+    <form id="worksheetModalForm" class="modal-form">
+      <input id="worksheetNameInputModal" type="text" class="modal-input" placeholder="Worksheet name" autocomplete="off" />
+      <div class="modal-actions">
+        <button type="button" id="worksheetModalCancel" class="btn">Cancel</button>
+        <button type="submit" class="btn primary">Continue</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="js/config.js"></script>
 <script src="js/script.js?v=20260728-2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>

@@ -23,6 +23,94 @@ function handleImportEvaluationClick(){
   document.getElementById('importEvaluationFile')?.click();
 }
 
+function openImportModal(options = {}){
+  return new Promise((resolve) => {
+    const modal = document.getElementById('worksheetModal');
+    const form = document.getElementById('worksheetModalForm');
+    const input = document.getElementById('worksheetNameInputModal');
+    const cancelBtn = document.getElementById('worksheetModalCancel');
+    const titleEl = document.getElementById('worksheetModalTitle');
+    const copyEl = modal?.querySelector('.modal-copy');
+    const submitBtn = form?.querySelector('button[type="submit"]');
+
+    if(!modal || !form || !input || !cancelBtn || !titleEl || !copyEl || !submitBtn){
+      if(options.mode === 'error'){
+        window.alert(options.message || 'Could not import this evaluation file.');
+        resolve('');
+        return;
+      }
+      const fallback = (window.prompt('Enter the worksheet (tab) name to import:', options.initialValue || '') || '').trim();
+      resolve(fallback);
+      return;
+    }
+
+    const isErrorMode = options.mode === 'error';
+    titleEl.textContent = options.title || (isErrorMode ? 'Import error' : 'Import evaluation');
+    copyEl.textContent = options.message || (isErrorMode ? 'Could not import this evaluation file.' : 'Enter the worksheet (tab) name from your exported evaluation file.');
+    submitBtn.textContent = options.confirmText || (isErrorMode ? 'OK' : 'Continue');
+    cancelBtn.hidden = isErrorMode;
+    input.hidden = isErrorMode;
+    input.value = isErrorMode ? '' : (options.initialValue || '');
+
+    const close = (value) => {
+      modal.hidden = true;
+      document.removeEventListener('keydown', onKeyDown);
+      form.removeEventListener('submit', onSubmit);
+      cancelBtn.removeEventListener('click', onCancelClick);
+      modal.removeEventListener('click', onBackdropClick);
+      resolve((value || '').trim());
+    };
+
+    const onSubmit = (e) => {
+      e.preventDefault();
+      close(isErrorMode ? 'ok' : input.value);
+    };
+
+    const onCancelClick = () => close('');
+
+    const onBackdropClick = (e) => {
+      if(e.target === modal) close('');
+    };
+
+    const onKeyDown = (e) => {
+      if(e.key === 'Escape') close('');
+    };
+
+    modal.hidden = false;
+    form.addEventListener('submit', onSubmit);
+    cancelBtn.addEventListener('click', onCancelClick);
+    modal.addEventListener('click', onBackdropClick);
+    document.addEventListener('keydown', onKeyDown);
+    setTimeout(() => {
+      if(isErrorMode){
+        submitBtn.focus();
+      } else {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+  });
+}
+
+function askWorksheetNameWithModal(previousValue){
+  return openImportModal({
+    mode: 'input',
+    initialValue: previousValue,
+    title: 'Import evaluation',
+    message: 'Enter the worksheet (tab) name from your exported evaluation file.',
+    confirmText: 'Continue'
+  });
+}
+
+function showImportErrorWithModal(message){
+  return openImportModal({
+    mode: 'error',
+    title: 'Import error',
+    message: message || 'Could not import this evaluation file.',
+    confirmText: 'OK'
+  });
+}
+
 function normalizeImportHeaderKey(value){
   return String(value || '').trim().toLowerCase();
 }
@@ -102,9 +190,9 @@ async function importEvaluationFromFile(file, worksheetName){
   status(`Imported evaluation \u2022 ${count} place(s) from "${matchedName}"`);
 }
 
-function resolveWorksheetName(){
+async function resolveWorksheetName(){
   const previousValue = localStorage.getItem(IMPORT_WORKSHEET_STORAGE_KEY) || '';
-  const worksheetName = (window.prompt('Enter the worksheet (tab) name to import:', previousValue) || '').trim();
+  const worksheetName = await askWorksheetNameWithModal(previousValue);
   if(worksheetName){
     localStorage.setItem(IMPORT_WORKSHEET_STORAGE_KEY, worksheetName);
   }
@@ -120,9 +208,8 @@ function wireImportEvaluation(){
     e.target.value = '';
     if(!file || isImportingEvaluation) return;
 
-    const worksheetName = resolveWorksheetName();
+    const worksheetName = await resolveWorksheetName();
     if(!worksheetName){
-      alert('Please enter the worksheet (tab) name to import.');
       return;
     }
 
@@ -134,7 +221,7 @@ function wireImportEvaluation(){
       await importEvaluationFromFile(file, worksheetName);
     } catch(err){
       console.error(err);
-      alert(err?.message || 'Could not import this evaluation file.');
+      await showImportErrorWithModal(err?.message || 'Could not import this evaluation file.');
       status('Import evaluation failed');
     } finally {
       isImportingEvaluation = false;
