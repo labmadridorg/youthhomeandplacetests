@@ -670,10 +670,12 @@ const TAG_KEYS = Object.keys(TAG_META);
 
 function setupLanguageUI(){
   const langSelect = document.getElementById('langSelect');
-  if (langSelect) {
-    langSelect.value = currentLang;
-    langSelect.addEventListener('change', e => setLanguage(e.target.value));
-  }
+  const langSelectMobile = document.getElementById('langSelectMobile');
+  [langSelect, langSelectMobile].forEach(select => {
+    if (!select) return;
+    select.value = currentLang;
+    select.addEventListener('change', e => setLanguage(e.target.value));
+  });
   const input = document.getElementById('importFile');
   if (input) input.multiple = true;
 }
@@ -692,7 +694,9 @@ function applyStaticTexts(){
   const exportCsvBtn = document.getElementById('exportCsvBtn');
   if (exportCsvBtn) exportCsvBtn.textContent = t('exportCSV');
   const printBtn = document.getElementById('printPassportsBtn');
-  if (printBtn) printBtn.textContent = window.matchMedia('(max-width: 900px)').matches ? 'Print' : t('printPassports');
+  if (printBtn) printBtn.textContent = t('printPassports');
+  const printBtnMobile = document.getElementById('printPassportsMobileBtn');
+  if (printBtnMobile) printBtnMobile.textContent = t('printPassports');
   const submitBtn = document.getElementById('submitEvaluationBtn');
   if (submitBtn) {
     const submitLabel = t('submitEvaluation');
@@ -704,7 +708,9 @@ function applyStaticTexts(){
     importBtn.textContent = importLabel === 'importMerge' ? 'Import / merge JSON' : importLabel;
   }
   const ls = document.getElementById('langSelect'); if (ls) ls.value = currentLang;
+  const lsMobile = document.getElementById('langSelectMobile'); if (lsMobile) lsMobile.value = currentLang;
   const langLabel = document.getElementById('langLabel'); if (langLabel) langLabel.textContent = t('language');
+  const langLabelMobile = document.getElementById('langLabelMobile'); if (langLabelMobile) langLabelMobile.textContent = t('language');
   const st = document.getElementById('status'); if (st && (!st.textContent || st.textContent === 'Not saved yet' || st.textContent === 'Nog niet opgeslagen')) st.textContent = t('notSaved');
 }
 function normalizePlaceType(value){ const v = String(value || '').trim().toLowerCase(); const map = {'plein':'square','square':'square','park':'park','straat':'street','street':'street','stationsomgeving':'station_area','station area':'station_area','speelplek':'playground','playground':'playground','hangplek':'hangout_spot','hangout spot':'hangout_spot','sportruimte':'sports_space','sports space':'sports_space','culturele plek':'cultural_place','cultural place':'cultural_place','anders':'other','other':'other'}; return map[v] || 'other'; }

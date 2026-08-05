@@ -46,6 +46,9 @@ body{
   font-weight:700;
   color:#5d777d;
 }
+.mobile-utility-row{
+  display:none;
+}
 .lang-select{
   border:1px solid rgba(78,141,143,0.4);
   background:#f7f5ec;
@@ -366,19 +369,53 @@ body{
 
 @media (max-width: 900px){
   .wrap{padding:14px;}
+  .topbar-lang{
+    display:none;
+  }
+  .mobile-utility-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0 0 10px 0;
+  }
+  .mobile-utility-lang{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+  .mobile-utility-lang span{
+    font-size:12px;
+    font-weight:700;
+    color:#5d777d;
+    white-space:nowrap;
+  }
+  #langSelectMobile{
+    min-width:92px;
+    min-height:42px;
+    padding:9px 28px 9px 10px;
+    font-size:12px;
+  }
+  #printPassportsMobileBtn{
+    min-height:42px;
+    padding:9px 14px;
+    font-size:12px;
+    white-space:nowrap;
+  }
   .toolbar{
     position:sticky;
     top:0;
     z-index:30;
     margin:0 0 16px 0;
-    padding:6px;
+    padding:0;
     display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-template-columns:repeat(3,minmax(0,1fr));
     gap:6px;
     border:0;
-    border-radius:10px;
-    overflow:hidden;
-    background:#ece9df;
+    border-radius:0;
+    overflow:visible;
+    background:transparent;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
   }
@@ -389,6 +426,7 @@ body{
   .toolbar-group-status,
   .toolbar-separator,
   #importJsonBtn,
+  #printPassportsBtn,
   #importEvaluationBtn,
   #status{
     display:none !important;
@@ -402,26 +440,28 @@ body{
   .toolbar::-webkit-scrollbar{display:none;}
   .toolbar .btn,
   .status{
-    white-space:nowrap;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    line-height:1.15;
     flex:0 0 auto;
   }
   #addPlaceBtn,
   #exportJsonBtn,
-  #printPassportsBtn,
   #submitEvaluationBtn{
     display:block;
     width:100%;
     min-width:0;
-    min-height:52px;
+    min-height:56px;
     margin:0;
     border:1px solid rgba(78,141,143,0.35);
     border-radius:8px;
     background:#f7f5ec;
     color:#35595f;
-    font-size:11px;
+    font-size:12px;
     font-weight:700;
     text-align:center;
-    padding:12px 8px;
+    padding:10px 6px;
   }
   #submitEvaluationBtn,
   #importEvaluationBtn{
@@ -438,6 +478,21 @@ body{
   .passport{
     border-radius:4px;
     padding:16px;
+  }
+}
+
+@media (max-width: 420px){
+  .mobile-utility-row{gap:8px;}
+  .mobile-utility-lang span{font-size:11px;}
+  #langSelectMobile{min-width:84px; font-size:11px;}
+  #printPassportsMobileBtn{font-size:11px; padding:8px 10px;}
+  .toolbar{gap:4px;}
+  #addPlaceBtn,
+  #exportJsonBtn,
+  #submitEvaluationBtn{
+    font-size:11px;
+    min-height:54px;
+    padding:9px 4px;
   }
 }
 
