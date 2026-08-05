@@ -692,7 +692,7 @@ function applyStaticTexts(){
   const exportCsvBtn = document.getElementById('exportCsvBtn');
   if (exportCsvBtn) exportCsvBtn.textContent = t('exportCSV');
   const printBtn = document.getElementById('printPassportsBtn');
-  if (printBtn) printBtn.textContent = t('printPassports');
+  if (printBtn) printBtn.textContent = window.matchMedia('(max-width: 900px)').matches ? 'Print' : t('printPassports');
   const submitBtn = document.getElementById('submitEvaluationBtn');
   if (submitBtn) {
     const submitLabel = t('submitEvaluation');
