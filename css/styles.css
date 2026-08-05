@@ -33,6 +33,29 @@ body{
 .topbar{
   display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;
 }
+.topbar-main{min-width:0;}
+.topbar-lang{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  align-self:flex-start;
+}
+.topbar-lang span{
+  font-size:12px;
+  font-weight:700;
+  color:#5d777d;
+}
+.lang-select{
+  border:1px solid rgba(78,141,143,0.4);
+  background:#f7f5ec;
+  color:#35595f;
+  padding:10px 30px 10px 12px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  min-height:40px;
+}
 h1{
   margin:0;font-size:34px;line-height:1;letter-spacing:-0.03em;font-weight:800;color:#143e47;
 }
@@ -276,6 +299,8 @@ h1{
 }
 @media (max-width: 700px){
   .topbar{align-items:flex-start;flex-direction:column}
+  .topbar-main{width:100%;}
+  .topbar-lang{align-self:flex-end;}
   .form-grid{grid-template-columns:1fr}
   .passport-meta,.passport-footer,.score-wrap{grid-template-columns:1fr}
   .score-meta-card{grid-template-columns:1fr;}

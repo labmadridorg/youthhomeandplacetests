@@ -769,13 +769,10 @@ const FAMILIARITY_KEYS = Object.keys(FAMILIARITY_META);
 const TAG_KEYS = Object.keys(TAG_META);
 
 function setupLanguageUI(){
-  const toolbar = document.querySelector('.toolbar');
-  if (toolbar && !document.getElementById('langSelect')) {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'display:flex;align-items:center;gap:8px;margin-left:auto;';
-    wrap.innerHTML = `<span id="langLabel" style="font-size:12px;font-weight:700;color:#5d777d;">${t('language')}</span><select id="langSelect" class="btn" style="padding-right:28px;"><option value="nl">NL</option><option value="en">EN</option></select>`;
-    toolbar.appendChild(wrap);
-    wrap.querySelector('#langSelect').addEventListener('change', e => setLanguage(e.target.value));
+  const langSelect = document.getElementById('langSelect');
+  if (langSelect) {
+    langSelect.value = currentLang;
+    langSelect.addEventListener('change', e => setLanguage(e.target.value));
   }
   const input = document.getElementById('importFile');
   if (input) input.multiple = true;
