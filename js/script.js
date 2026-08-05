@@ -798,6 +798,16 @@ function applyStaticTexts(){
   const h1 = document.querySelector('.topbar h1'); if (h1) h1.textContent = t('title');
   const sub = document.querySelector('.topbar .sub'); if (sub) sub.textContent = t('subtitle');
   const leftH2 = document.querySelector('.panel.left h2'); if (leftH2) leftH2.textContent = t('places');
+  const addBtn = document.getElementById('addPlaceBtn');
+  if (addBtn) addBtn.textContent = t('addPlace');
+  const saveBtn = document.getElementById('saveBoardBtn');
+  if (saveBtn) saveBtn.textContent = t('saveBrowser');
+  const exportJsonBtn = document.getElementById('exportJsonBtn');
+  if (exportJsonBtn) exportJsonBtn.textContent = t('exportJSON');
+  const exportCsvBtn = document.getElementById('exportCsvBtn');
+  if (exportCsvBtn) exportCsvBtn.textContent = t('exportCSV');
+  const printBtn = document.getElementById('printPassportsBtn');
+  if (printBtn) printBtn.textContent = t('printPassports');
   const submitBtn = document.getElementById('submitEvaluationBtn');
   if (submitBtn) {
     const submitLabel = t('submitEvaluation');
@@ -808,12 +818,6 @@ function applyStaticTexts(){
     const importLabel = t('importMerge');
     importBtn.textContent = importLabel === 'importMerge' ? 'Import / merge JSON' : importLabel;
   }
-  const btns = document.querySelectorAll('.toolbar .btn');
-  if (btns[0]) btns[0].textContent = t('addPlace');
-  if (btns[1]) btns[1].textContent = t('saveBrowser');
-  if (btns[2]) btns[2].textContent = t('exportJSON');
-  if (btns[3]) btns[3].textContent = t('exportCSV');
-  if (btns[4]) btns[4].textContent = t('printPassports');
   const ls = document.getElementById('langSelect'); if (ls) ls.value = currentLang;
   const langLabel = document.getElementById('langLabel'); if (langLabel) langLabel.textContent = t('language');
   const st = document.getElementById('status'); if (st && (!st.textContent || st.textContent === 'Not saved yet' || st.textContent === 'Nog niet opgeslagen')) st.textContent = t('notSaved');
