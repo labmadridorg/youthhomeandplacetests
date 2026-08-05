@@ -369,6 +369,7 @@ body{
 
 @media (max-width: 900px){
   .wrap{padding:0 14px 14px;}
+  .topbar{margin-top:12px;}
   .topbar-lang{
     display:none;
   }
@@ -484,6 +485,7 @@ body{
 
 @media (max-width: 420px){
   .mobile-utility-row{gap:8px;}
+  .topbar{margin-top:10px;}
   .mobile-utility-lang span{font-size:11px;}
   #langSelectMobile{min-width:84px; font-size:11px;}
   #printPassportsMobileBtn{font-size:11px; padding:8px 10px;}
