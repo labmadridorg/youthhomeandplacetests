@@ -23,18 +23,15 @@
   </div>
 
   <div class="toolbar">
-    <!-- TODO: create 2 rows-->
-    <input type="text" id="sheetNameInput" class="sheet-name-input" placeholder="Sheet name (e.g. BE)" />
     <button class="btn primary" onclick="addPlace()">+ Plek toevoegen</button>
     <button class="btn" onclick="saveBoard()">Bewaar in deze browser</button>
     <button class="btn" onclick="exportJSON()">Export JSON</button>
     <button class="btn" onclick="exportCSV()">Export CSV</button>
     <button class="btn" onclick="printPassports()">Print passports</button>
-    <button id="submitEvaluationBtn" class="btn" onclick="submitPassport(getPassportForSubmission())">Submit Evaluation</button>
+    <button id="submitEvaluationBtn" class="btn" onclick="handleSubmitEvaluationClick()">Submit Evaluation</button>
     <span class="status" id="status">Not saved yet</span>
     <input type="file" id="importFile" accept=".json,application/json" style="display:none" />
     <button id="importJsonBtn" class="btn" onclick="document.getElementById('importFile').click()">Import JSON</button>
-    <!-- TODO: ask for input in popup-->
     <input type="file" id="importEvaluationFile" accept=".xlsx" style="display:none" />
     <button id="importEvaluationBtn" class="btn" onclick="handleImportEvaluationClick()">Import Evaluation</button>
   </div>
