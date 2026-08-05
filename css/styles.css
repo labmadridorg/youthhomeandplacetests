@@ -377,6 +377,7 @@ body{
     align-items:center;
     justify-content:space-between;
     gap:10px;
+    padding:6px;
     margin:0 0 10px 0;
   }
   .mobile-utility-lang{
